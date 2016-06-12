@@ -243,3 +243,5 @@ ModelManifest.xml
 
 # FAKE - F# Make
 .fake/
+/__pycache__/Image.cpython-35.pyc
+*.pyperf
