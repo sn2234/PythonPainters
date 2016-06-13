@@ -2,6 +2,9 @@ import math
 import pandas as pd
 import numpy as np
 from sklearn import preprocessing
+from sklearn.neighbors import NearestNeighbors
+from sklearn.neighbors import KNeighborsClassifier
+from sklearn.metrics import accuracy_score
 
 import numpy as np
 import matplotlib.pyplot as plt
@@ -67,7 +70,7 @@ for name, group in groups:
 # Experiment #1
 # Check corellation between colors histogram and painter.
 # 1. Extract image and artist from csvExistingFiles
-subFrame = csvExistingFiles.head(50)
+subFrame = csvExistingFiles.sample(100)
 
 dataFrame = pd.DataFrame()
 dataFrame['id'] = subFrame['id']
@@ -76,10 +79,19 @@ dataFrame['artist'] = subFrame['artist']
 # 2. Load and transform image into histogram
 def processImage(x):
     print("Processing file: {0}".format(x))
-    return preprocessing.minmax_scale(Image.calcImageHistFast(join(trainDataFolder, x), 10).astype(float))
+    return preprocessing.minmax_scale(Image.calcImageHistFast(join(trainDataFolder, x), 50).astype(float))
 
 dataFrame['hist'] = subFrame['filename'].map(processImage)
 
 # 3. Build kNN database {histogram => artist}
+knn = KNeighborsClassifier()
+knn.fit(np.vstack(dataFrame['hist'].values), dataFrame['artist'].values)
+
 # 4. Check it against trainFrame
+checkFrame = trainFrame.sample(100)
+
+xx = knn.predict(np.vstack(checkFrame['FirstName'].map(processImage))) == \
+     knn.predict(np.vstack(checkFrame['SecondName'].map(processImage)))
+
+accuracy_score(checkFrame['Same'], xx)
 # In more advanced scenario, split csvExistingFiles into two parts, one for kNN and second for validation
