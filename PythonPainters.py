@@ -70,14 +70,14 @@ for name, group in groups:
            'SecondName' : group['filename'].values[idSecond],
            'Same' : True
            }
-checkFrame = trainFrame.sample(1000)
+checkFrame = trainFrame.sample(200)
 firstProc = np.vstack(checkFrame['FirstName'].map(processImage))
 secondProc = np.vstack(checkFrame['SecondName'].map(processImage))
 
 # Experiment #1
 # Check corellation between colors histogram and painter.
 # 1. Extract image and artist from csvExistingFiles
-subFrame = csvExistingFiles.sample(1000)
+subFrame = csvExistingFiles.sample(200)
 
 dataFrame = pd.DataFrame()
 dataFrame['id'] = subFrame['id']
@@ -88,7 +88,7 @@ dataFrame['artist'] = subFrame['artist']
 dataFrame['hist'] = subFrame['filename'].map(processImage)
 
 # 3. Build kNN database {histogram => artist}
-knn = KNeighborsClassifier(n_neighbors=5, p=15)
+knn = KNeighborsClassifier(n_neighbors=8, metric=Image.chiSquareDistance)
 knn.fit(np.vstack(dataFrame['hist'].values), dataFrame['artist'].values)
 
 # 4. Check it against trainFrame
@@ -96,4 +96,3 @@ knn.fit(np.vstack(dataFrame['hist'].values), dataFrame['artist'].values)
 xx = knn.predict(firstProc) == knn.predict(secondProc)
 
 accuracy_score(checkFrame['Same'], xx)
-# In more advanced scenario, split csvExistingFiles into two parts, one for kNN and second for validation

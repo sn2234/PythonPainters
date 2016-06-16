@@ -4,6 +4,7 @@ import matplotlib.pyplot as plt
 from skimage import io
 from skimage.exposure import histogram
 from sklearn import preprocessing
+from pyemd import emd
 
 #img = io.imread("..\\Data\\Train\\10.jpg")
 
@@ -33,3 +34,10 @@ def calcImageHistFast(imagePath, nbins):
     img = io.imread(imagePath, as_grey=True)
 
     return np.histogram(preprocessing.minmax_scale(img), bins=nbins)[0]
+
+def chiSquareDistance(h1, h2):
+    return np.sum((h1-h2)**2/(h1+h2+1e-10))
+
+def emdDistance(h1, h2):
+    return emd(h1, h2, np.ones((h1.shape[0], h1.shape[0]))/2)
+
