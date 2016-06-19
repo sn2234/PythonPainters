@@ -4,7 +4,7 @@ import numpy as np
 from sklearn import preprocessing
 from sklearn.neighbors import NearestNeighbors
 from sklearn.neighbors import KNeighborsClassifier
-from sklearn.metrics import accuracy_score
+import sklearn.metrics as metrics
 
 import numpy as np
 import matplotlib.pyplot as plt
@@ -70,14 +70,14 @@ for name, group in groups:
            'SecondName' : group['filename'].values[idSecond],
            'Same' : True
            }
-checkFrame = trainFrame.sample(200)
+checkFrame = trainFrame.sample(1000)
 firstProc = np.vstack(checkFrame['FirstName'].map(processImage))
 secondProc = np.vstack(checkFrame['SecondName'].map(processImage))
 
 # Experiment #1
 # Check corellation between colors histogram and painter.
 # 1. Extract image and artist from csvExistingFiles
-subFrame = csvExistingFiles.sample(200)
+subFrame = csvExistingFiles.sample(1000)
 
 dataFrame = pd.DataFrame()
 dataFrame['id'] = subFrame['id']
@@ -95,4 +95,6 @@ knn.fit(np.vstack(dataFrame['hist'].values), dataFrame['artist'].values)
 
 xx = knn.predict(firstProc) == knn.predict(secondProc)
 
-accuracy_score(checkFrame['Same'], xx)
+print(metrics.accuracy_score(checkFrame['Same'], xx))
+print(metrics.confusion_matrix(checkFrame['Same'], xx))
+print("Classification report\n{0}".format(metrics.classification_report(checkFrame['Same'], xx)))

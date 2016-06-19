@@ -2,9 +2,13 @@
 import numpy as np
 import matplotlib.pyplot as plt
 from skimage import io
+from scipy.misc import imread
 from skimage.exposure import histogram
 from sklearn import preprocessing
 from pyemd import emd
+
+from PIL import ImageFile
+ImageFile.LOAD_TRUNCATED_IMAGES = True
 
 #img = io.imread("..\\Data\\Train\\10.jpg")
 
@@ -31,7 +35,7 @@ def calcImageHist(imagePath, nbins):
     return np.histogram(imgNorm, bins=nbins)
 
 def calcImageHistFast(imagePath, nbins):
-    img = io.imread(imagePath, as_grey=True)
+    img = imread(imagePath, mode="F")
 
     return np.histogram(preprocessing.minmax_scale(img), bins=nbins)[0]
 
@@ -41,3 +45,10 @@ def chiSquareDistance(h1, h2):
 def emdDistance(h1, h2):
     return emd(h1, h2, np.ones((h1.shape[0], h1.shape[0]))/2)
 
+#from sklearn.decomposition import PCA
+
+#pca = PCA(n_components='mle', whiten=True)
+
+#img = io.imread("..\\Data\\Train\\10.jpg", as_grey=True)
+
+#xx = pca.fit_transform(img)
