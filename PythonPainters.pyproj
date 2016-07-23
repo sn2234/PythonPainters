@@ -22,8 +22,17 @@
     <EnableUnmanagedDebugging>false</EnableUnmanagedDebugging>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="DataModel.py">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="Image.py" />
+    <Compile Include="KnnWithStyle.py">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="PythonPainters.py" />
+    <Compile Include="TestVggKeras.py">
+      <SubType>Code</SubType>
+    </Compile>
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
