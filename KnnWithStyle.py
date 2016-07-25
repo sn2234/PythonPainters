@@ -23,7 +23,7 @@ def processImage(x):
 # Check corellation between colors histogram and painter.
 # 1. Extract image and artist from csvExistingFiles
 
-numSamples = 5
+numSamples = 100
 
 checkFrame =  DataModel.trainFrame.sample(numSamples)
 firstProc = np.vstack(checkFrame['FirstName'].map(processImage))
@@ -40,7 +40,7 @@ dataFrame['artist'] = subFrame['artist']
 dataFrame['hist'] = subFrame['filename'].map(processImage)
 
 # 3. Build kNN database {histogram => artist}
-knn = KNeighborsClassifier(n_neighbors=2, metric=TestVggKeras.diffImagesStyles)
+knn = KNeighborsClassifier(n_neighbors=5, metric=TestVggKeras.diffImagesStyles)
 knn.fit(np.vstack(dataFrame['hist'].values), dataFrame['artist'].values)
 
 # 4. Check it against trainFrame

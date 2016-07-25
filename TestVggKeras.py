@@ -88,7 +88,7 @@ def my_style_loss(style, combination):
     return np.sum(np.square(S - C)) / (4. * (channels ** 2) * (size ** 2))
 
 def prepareImage(imagePath):
-    im = img.imresize(img.imread(imagePath), (224, 224)).astype(np.float32)
+    im = img.imresize(img.imread(imagePath, mode='RGB'), (224, 224)).astype(np.float32)
     im = im.transpose((2,0,1))
     im = np.expand_dims(im, axis=0)
     return im
@@ -98,9 +98,12 @@ def extractImageStyle(imagePath):
     im = prepareImage(imagePath)
     out = model.predict(im)
     style = out[0, :, :, :]
+    assert style.shape == originalStyleShape
     return style.flatten()
 
 def diffImagesStyles(style1, style2):
+    if style1.shape != (512 * 7 * 7,) : print("Test call", style1.shape); return 0
+    if style2.shape != (512 * 7 * 7,) : print("Test call next", style2.shape); return 0
     styleDiff = my_style_loss(style1.reshape(originalStyleShape), style2.reshape(originalStyleShape))
     
     return styleDiff
