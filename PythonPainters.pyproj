@@ -25,6 +25,9 @@
     <Compile Include="DataModel.py">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="DistanceRegression.py">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="Image.py" />
     <Compile Include="KnnWithStyle.py">
       <SubType>Code</SubType>
