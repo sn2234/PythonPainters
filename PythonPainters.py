@@ -22,12 +22,13 @@ def processImage(x):
 # Experiment #1
 # Check corellation between colors histogram and painter.
 # 1. Extract image and artist from csvExistingFiles
+numSamples = 50
 
-checkFrame =  DataModel.trainFrame.sample(1000)
+checkFrame =  DataModel.trainFrame.sample(numSamples)
 firstProc = np.vstack(checkFrame['FirstName'].map(processImage))
 secondProc = np.vstack(checkFrame['SecondName'].map(processImage))
 
-subFrame = DataModel.csvExistingFiles.sample(1000)
+subFrame = DataModel.csvExistingFiles.sample(numSamples)
 
 dataFrame = pd.DataFrame()
 dataFrame['id'] = subFrame['id']
