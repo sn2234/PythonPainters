@@ -25,8 +25,6 @@ def processImage(x):
 def chiSquareDistanceRaw(h1, h2):
     return (h1-h2)**2/(h1+h2+1e-10)
 
-# Experiment #1
-# Check corellation between colors histogram and painter.
 # 1. Extract image and artist from csvExistingFiles
 
 subFrame =  DataModel.trainFrame.sample(1000)

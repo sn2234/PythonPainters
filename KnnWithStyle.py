@@ -19,8 +19,6 @@ def processImage(x):
     print("Processing file: {0}".format(x))
     return TestVggKeras.extractImageStyle(join(DataModel.trainDataFolder, x))
 
-# Experiment #1
-# Check corellation between colors histogram and painter.
 # 1. Extract image and artist from csvExistingFiles
 
 numSamples = 100
