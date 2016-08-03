@@ -6,8 +6,9 @@ from sklearn import cross_validation
 import matplotlib.pyplot as plt
 from os.path import join
 
-from keras.layers import Input, Dense
+from keras.layers import Input, Dense, Dropout
 from keras.models import Model
+from keras.models import Sequential
 
 import DataModel
 import TestVggKeras
@@ -16,31 +17,47 @@ def processImage(x):
     print("Processing file: {0}".format(x))
     return TestVggKeras.extractImageStyle(join(DataModel.trainDataFolder, x))
 
-numSamples = 100
+numSamples = 10
 
-subFrame =  DataModel.trainFrame.sample(numSamples)
-subFrame['FirstStyle'] = subFrame['FirstName'].map(processImage)
-subFrame['SecondStyle'] = subFrame['SecondName'].map(processImage)
-subFrame['Distance'] = [
-    TestVggKeras.diffImagesStyles(subFrame['FirstStyle'].values[i], subFrame['SecondStyle'].values[i])
-                     for i in range(len(subFrame))]
+print("Preparing datasets...")
+subFrameTrue =  DataModel.trainFrame[DataModel.trainFrame['Same'] == True].sample(numSamples)
+subFrameTrue['FirstStyle'] = subFrameTrue['FirstName'].map(processImage)
+subFrameTrue['SecondStyle'] = subFrameTrue['SecondName'].map(processImage)
+subFrameTrue['Distance'] = [
+    TestVggKeras.diffImagesStyles(subFrameTrue['FirstStyle'].values[i], subFrameTrue['SecondStyle'].values[i])
+                     for i in range(len(subFrameTrue))]
+
+subFrameFalse =  DataModel.trainFrame[DataModel.trainFrame['Same'] == False].sample(numSamples)
+subFrameFalse['FirstStyle'] = subFrameFalse['FirstName'].map(processImage)
+subFrameFalse['SecondStyle'] = subFrameFalse['SecondName'].map(processImage)
+subFrameFalse['Distance'] = [
+    TestVggKeras.diffImagesStyles(subFrameFalse['FirstStyle'].values[i], subFrameFalse['SecondStyle'].values[i])
+                     for i in range(len(subFrameFalse))]
 
 combined = np.hstack((
-    np.vstack(subFrame['FirstStyle'].values),
-    np.vstack(subFrame['SecondStyle'].values),
-    subFrame['Distance'].values.reshape(numSamples, 1)))
+    np.vstack((np.vstack(subFrameTrue['FirstStyle'].values), np.vstack(subFrameFalse['FirstStyle'].values))),
+    np.vstack((np.vstack(subFrameTrue['SecondStyle'].values), np.vstack(subFrameFalse['SecondStyle'].values))),
+    np.vstack((subFrameTrue['Distance'].values.reshape(numSamples, 1),
+               subFrameFalse['Distance'].values.reshape(numSamples, 1)))))
 
-(x_train, x_cv, y_train, y_cv) = cross_validation.train_test_split(combined, subFrame['Same'].values, test_size=0.3)
+(x_train, x_cv, y_train, y_cv) = cross_validation.train_test_split(combined,
+                                                                   np.hstack((subFrameTrue['Same'].values,
+                                                                              subFrameFalse['Same'].values)),
+                                                                   test_size=0.3)
 
-model_input = Input(shape=(combined.shape[1],))
-model_pred = Dense(1, activation='sigmoid')(model_input)
-model = Model(input=model_input, output = model_pred)
+print("Initializing model...")
+
+model = Sequential()
+model.add(Dense(512, input_shape=(combined.shape[1],), activation='relu'))
+model.add(Dropout(0.2))
+model.add(Dense(512, activation='relu'))
+model.add(Dropout(0.2))
+model.add(Dense(1, activation='sigmoid'))
 model.compile(optimizer='rmsprop',
                 loss='binary_crossentropy',
                 metrics=['accuracy'])
-
-model.fit(x_train, y_train, nb_epoch=10)
-model.evaluate(x_cv, y_cv)
+print("Fitting model...")
+model.fit(x_train, y_train)
 
 pp = model.predict(x_cv)
 
