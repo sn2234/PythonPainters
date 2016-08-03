@@ -1,0 +1,4 @@
+set PATH=%PATH%;M:\SDKs\cuda\cuda\bin
+set INCLUDE=%INCLUDE%;M:\SDKs\cuda\cuda\include
+set LIB=%LIB%;M:\SDKs\cuda\cuda\lib\x64;
+set THEANO_FLAGS=mode=FAST_RUN,device=gpu,floatX=float32,dnn.enabled=True,lib.cnmem=0.4
