@@ -43,6 +43,8 @@ model.fit(x_train, y_train, nb_epoch=10)
 model.evaluate(x_cv, y_cv)
 
 pp = model.predict(x_cv)
-print(metrics.accuracy_score(y_cv, pp))
-print(metrics.confusion_matrix(y_cv, pp))
-print("Classification report\n{0}".format(metrics.classification_report(y_cv, pp)))
+
+pp_bool = np.isclose(True, pp)
+print(metrics.accuracy_score(y_cv, pp_bool))
+print(metrics.confusion_matrix(y_cv, pp_bool))
+print("Classification report\n{0}".format(metrics.classification_report(y_cv, pp_bool)))

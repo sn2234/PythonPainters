@@ -32,10 +32,14 @@
     <Compile Include="KnnWithStyle.py">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="PredictOnStyle.py" />
     <Compile Include="PythonPainters.py" />
     <Compile Include="TestVggKeras.py">
       <SubType>Code</SubType>
     </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="TheanoGPU.txt" />
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
