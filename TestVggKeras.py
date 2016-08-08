@@ -72,8 +72,10 @@ print('Model loaded.')
 sgd = SGD(lr=0.1, decay=1e-6, momentum=0.9, nesterov=True)
 model.compile(optimizer=sgd, loss='categorical_crossentropy')
 
+# Common parameters
 img_width = 400
 img_height = 400
+originalStyleShape = (512, 7, 7)
 
 def my_gramm_matrix(x):
     features = x.reshape((x.shape[0], x.shape[1]*x.shape[2]))
@@ -93,7 +95,7 @@ def prepareImage(imagePath):
     im = np.expand_dims(im, axis=0)
     return im
 
-originalStyleShape = (512, 7, 7)
+
 def extractImageStyle(imagePath):
     im = prepareImage(imagePath)
     out = model.predict(im)
@@ -105,5 +107,40 @@ def diffImagesStyles(style1, style2):
     if style1.shape != (512 * 7 * 7,) : print("Test call", style1.shape); return 0
     if style2.shape != (512 * 7 * 7,) : print("Test call next", style2.shape); return 0
     styleDiff = my_style_loss(style1.reshape(originalStyleShape), style2.reshape(originalStyleShape))
+    
+    return styleDiff
+
+# Optimized version of diffImageStyles
+
+# the gram matrix of an image tensor (feature-wise outer product)
+def gram_matrix(x):
+    assert K.ndim(x) == 3
+    features = K.batch_flatten(x)
+    gram = K.dot(features, K.transpose(features))
+    return gram
+
+def style_loss(style1, style2):
+    assert K.ndim(style1) == 3
+    assert K.ndim(style2) == 3
+    S = gram_matrix(style1)
+    C = gram_matrix(style2)
+    channels = 3
+    size = img_width * img_height
+    return K.sum(K.square(S - C)) / (4. * (channels ** 2) * (size ** 2))
+
+styleInput1 = K.placeholder(originalStyleShape)
+styleInput2 = K.placeholder(originalStyleShape)
+
+ls = style_loss(styleInput1, styleInput2)
+
+style_loss_fn = K.function([styleInput1, styleInput2], ls)
+
+def diffImagesStylesOpt(style1, style2):
+    if style1.shape != (512 * 7 * 7,) : print("Test call", style1.shape); return 0
+    if style2.shape != (512 * 7 * 7,) : print("Test call next", style2.shape); return 0
+
+    style_tensor_im1 = K.variable(style1.reshape(originalStyleShape))
+    style_tensor_im2 = K.variable(style2.reshape(originalStyleShape))
+    styleDiff = style_loss_fn((style1.reshape(originalStyleShape), style2.reshape(originalStyleShape)))
     
     return styleDiff

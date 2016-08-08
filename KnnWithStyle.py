@@ -21,7 +21,7 @@ def processImage(x):
 
 # 1. Extract image and artist from csvExistingFiles
 
-numSamples = 100
+numSamples = 1000
 
 checkFrame =  DataModel.trainFrame.sample(numSamples)
 firstProc = np.vstack(checkFrame['FirstName'].map(processImage))
@@ -38,12 +38,12 @@ dataFrame['artist'] = subFrame['artist']
 dataFrame['hist'] = subFrame['filename'].map(processImage)
 
 # 3. Build kNN database {histogram => artist}
-knn = KNeighborsClassifier(n_neighbors=5, metric=TestVggKeras.diffImagesStyles)
+knn = KNeighborsClassifier(n_neighbors=5, metric=TestVggKeras.diffImagesStylesOpt)
 knn.fit(np.vstack(dataFrame['hist'].values), dataFrame['artist'].values)
 
 # 4. Check it against trainFrame
 
-xx = knn.predict(firstProc) == knn.predict(secondProc)
+xx = knn.predict(firstProc[:20,:]) == knn.predict(secondProc[:20,:])
 
 print(metrics.accuracy_score(checkFrame['Same'], xx))
 print(metrics.confusion_matrix(checkFrame['Same'], xx))

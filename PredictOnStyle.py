@@ -17,7 +17,7 @@ def processImage(x):
     print("Processing file: {0}".format(x))
     return TestVggKeras.extractImageStyle(join(DataModel.trainDataFolder, x))
 
-numSamples = 10
+numSamples = 1000
 
 print("Preparing datasets...")
 subFrameTrue =  DataModel.trainFrame[DataModel.trainFrame['Same'] == True].sample(numSamples)
